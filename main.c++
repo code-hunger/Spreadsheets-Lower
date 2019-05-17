@@ -130,7 +130,7 @@ ParseResult parse_unquoted(string str)
 {
 	size_t length = 0;
 
-	for (int i = 0; i < str.size() || str[i] == ','; ++i)
+	for (int i = 0; i < str.size() && str[i] == ','; ++i)
 		++length;
 
 	return {
@@ -198,17 +198,34 @@ public:
 
 			std::getline(input, buffer);
 
+			boost::trim(buffer);
+
 			while (buffer.size() > 0) {
+				boost::trim(buffer);
+
 				if (ParseResult result = parse(buffer)) {
 					row.push_back(std::move(result->second));
 					buffer = buffer.substr(result->first);
 					boost::trim_left(buffer);
-					if(buffer.size() > 0 && buffer[0] == ',')
+					if (buffer.size() > 0 && buffer[0] == ',')
 						buffer = buffer.substr(1);
+				} else {
+					std::cout << "Couldn't parse line " << data.size() << std::endl;
+					break;
 				}
 			}
 
 			data.push_back(std::move(row));
+		}
+	}
+
+	void print()
+	{
+		for (RowT const& row : data) {
+			for (auto& cell : row) {
+				std::cout << cell->str() << ", ";
+			}
+			std::cout << std::endl;
 		}
 	}
 };
@@ -227,4 +244,6 @@ int main(int argc, char* argv[])
 	}
 
 	Table table{std::cin};
+
+	table.print();
 }
