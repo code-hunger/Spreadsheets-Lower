@@ -94,15 +94,23 @@ public:
 		if (str[0] != quote) return {};
 
 		int length = 1;
+		string value;
 		while ((behindBackquote || str[length] != quote) and
 		       length < str.size()) {
+
+			if (!behindBackquote && str[length] == '\\')
+				behindBackquote = true;
+			else {
+				behindBackquote = false;
+				value += str[length];
+			}
+
 			++length;
 		}
 
 		if (behindBackquote || str[length] != quote) return {};
 
-		return {std::pair(length,
-		                  std::make_unique<StringCell>(str.substr(0, length)))};
+		return {std::pair(length, std::make_unique<StringCell>(value))};
 	}
 
 	string str() const { return value; }
@@ -127,7 +135,7 @@ public:
 
 int main(int argc, char* argv[])
 {
-	ParseResult result = parse<IntCell>(argv[1]);
+	ParseResult result = parse<StringCell>(argv[1]);
 
 	if (result.has_value()) {
 		auto& value = result.value();
