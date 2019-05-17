@@ -75,9 +75,16 @@ class EmptyCell
 	string str() { return ""; }
 };
 
+template <typename CellType> auto parse(string str)
+{
+	static_assert(std::is_base_of<Cell, CellType>::value,
+	              "Can parse only Cells");
+	return CellType::parse(str);
+}
+
 int main(int argc, char* argv[])
 {
-	auto result = IntCell::parse(argv[1]);
+	auto result = parse<IntCell>(argv[1]);
 
 	if (result.has_value()) {
 		auto value = result.value();
