@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -123,19 +124,75 @@ template <typename CellType> auto parse(string str)
 	return CellType::parse(str);
 }
 
+ParseResult parse_unquoted(string str)
+{
+	size_t length = 0;
+
+	for (int i = 0; i < str.size() || str[i] == ','; ++i)
+		++length;
+
+	return {
+	    std::pair{length, std::make_unique<StringCell>(str.substr(0, length))}};
+}
+
+ParseResult parse_with_available_cells(string str)
+{
+	if (auto res = IntCell::parse(str)) return res;
+	if (auto res = StringCell::parse(str)) return res;
+	if (auto res = EmptyCell::parse(str)) return res;
+	return parse_unquoted(str);
+}
+
+bool is_prefix(string pref, string str)
+{
+	for (size_t i = 0; i < pref.size(); ++i) {
+		if (str[i] != pref[i] || i >= str.size()) return false;
+	}
+	return true;
+}
+
+bool is_prefix(char prefix, string str)
+{
+	return str.size() >= 1 && str[0] == prefix;
+}
+
+ParseResult parse(string str, string cellSeparator)
+{
+	ParseResult result = parse_with_available_cells(str);
+
+	if (!result) return result;
+	auto& value = result.value();
+	string remainingString = (str.substr(value.first));
+	boost::trim(remainingString);
+
+	// A match is only successful at the end of a string or at the separator
+	if (remainingString.empty() || is_prefix(cellSeparator, remainingString))
+		return result;
+
+	return {};
+}
+
+ParseResult parse(string str, char cellSeparator)
+{
+	return parse(str, string{cellSeparator});
+}
+
 using std::vector;
 
-class Table {
+class Table
+{
 	using RowT = vector<unique_ptr<Cell>>;
 	vector<RowT> data;
 
 public:
-	Table () = default;
+	Table() = default;
+
+	Table(std::istream str) {}
 };
 
 int main(int argc, char* argv[])
 {
-	ParseResult result = parse<StringCell>(argv[1]);
+	ParseResult result = parse(argv[1], ',');
 
 	if (result.has_value()) {
 		auto& value = result.value();
