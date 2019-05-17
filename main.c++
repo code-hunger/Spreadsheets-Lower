@@ -6,18 +6,21 @@
 #include <memory>
 
 using std::string;
+using std::unique_ptr;
 
 struct Cell
 {
 	virtual string str() const = 0;
 };
 
+using ParseResult = std::optional<std::pair<size_t, unique_ptr<Cell>>>;
+
 class IntCell : public Cell
 {
 	int value;
 
 public:
-	static std::optional<std::pair<size_t, IntCell>> parse(string str)
+	static ParseResult parse(string str)
 	{
 		if (str.empty()) return {};
 
@@ -42,7 +45,7 @@ public:
 		if (is_signed && chars_read == 1 or !is_signed && chars_read == 0)
 			return {};
 
-		return {std::pair{chars_read, IntCell{num}}};
+		return {std::pair{chars_read, std::make_unique<IntCell>(num)}};
 	};
 
 	IntCell(int value) : value(value) {}
@@ -85,7 +88,6 @@ template <typename CellType> auto parse(string str)
 }
 
 using std::vector;
-using std::unique_ptr;
 
 class Table {
 	using RowT = vector<unique_ptr<Cell>>;
@@ -93,16 +95,16 @@ class Table {
 
 public:
 	Table () = default;
-}
+};
 
 int main(int argc, char* argv[])
 {
-	auto result = parse<IntCell>(argv[1]);
+	ParseResult result = parse<IntCell>(argv[1]);
 
 	if (result.has_value()) {
-		auto value = result.value();
-		Cell& cell = value.second;
-		std::cout << "Parsed " << cell.str() << " with " << value.first
+		auto& value = result.value();
+		auto& cell = value.second;
+		std::cout << "Parsed " << cell->str() << " with " << value.first
 		          << " chars." << std::endl;
 	} else {
 		std::cout << "Couldn't parse!" << std::endl;
