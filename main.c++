@@ -189,7 +189,7 @@ class Table
 public:
 	Table() = default;
 
-	Table(std::istream input)
+	Table(std::istream& input)
 	{
 		while (!input.eof()) {
 			RowT row;
@@ -225,4 +225,6 @@ int main(int argc, char* argv[])
 	} else {
 		std::cout << "Couldn't parse!" << std::endl;
 	}
+
+	Table table{std::cin};
 }
