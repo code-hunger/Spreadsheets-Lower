@@ -174,7 +174,7 @@ ParseResult parse(string str, string cellSeparator)
 	return {};
 }
 
-ParseResult parse(string str, char cellSeparator)
+ParseResult parse(string str, char cellSeparator = ',')
 {
 	return parse(str, string{cellSeparator});
 }
@@ -189,7 +189,28 @@ class Table
 public:
 	Table() = default;
 
-	Table(std::istream str) {}
+	Table(std::istream input)
+	{
+		while (!input.eof()) {
+			RowT row;
+			// @TODO make it work for longer lines
+			string buffer;
+
+			std::getline(input, buffer);
+
+			while (buffer.size() > 0) {
+				if (ParseResult result = parse(buffer)) {
+					row.push_back(std::move(result->second));
+					buffer = buffer.substr(result->first);
+					boost::trim_left(buffer);
+					if(buffer.size() > 0 && buffer[0] == ',')
+						buffer = buffer.substr(1);
+				}
+			}
+
+			data.push_back(std::move(row));
+		}
+	}
 };
 
 int main(int argc, char* argv[])
