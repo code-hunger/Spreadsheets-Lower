@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
-#include <memory>
 
 using std::string;
 using std::unique_ptr;
@@ -70,14 +70,14 @@ public:
 	}
 };
 
-class EmptyCell
+struct EmptyCell : Cell
 {
-	static std::optional<std::pair<size_t, EmptyCell>> parse(string)
+	static ParseResult parse(string)
 	{
-		return {std::pair{0, EmptyCell{}}};
+		return {std::pair{0, std::make_unique<EmptyCell>()}};
 	}
 
-	string str() { return ""; }
+	string str() const { return ""; }
 };
 
 template <typename CellType> auto parse(string str)
