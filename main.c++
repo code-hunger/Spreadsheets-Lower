@@ -111,6 +111,8 @@ public:
 
 		if (behindBackquote || str[length] != quote) return {};
 
+		++length; // to include the final quote
+
 		return {std::pair(length, std::make_unique<StringCell>(value))};
 	}
 
