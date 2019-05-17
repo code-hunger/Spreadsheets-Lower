@@ -2,6 +2,8 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
+#include <memory>
 
 using std::string;
 
@@ -80,6 +82,17 @@ template <typename CellType> auto parse(string str)
 	static_assert(std::is_base_of<Cell, CellType>::value,
 	              "Can parse only Cells");
 	return CellType::parse(str);
+}
+
+using std::vector;
+using std::unique_ptr;
+
+class Table {
+	using RowT = vector<unique_ptr<Cell>>;
+	vector<RowT> data;
+
+public:
+	Table () = default;
 }
 
 int main(int argc, char* argv[])
