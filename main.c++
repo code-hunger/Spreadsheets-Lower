@@ -80,6 +80,34 @@ struct EmptyCell : Cell
 	string str() const { return ""; }
 };
 
+class StringCell : public Cell
+{
+	string value;
+
+public:
+	StringCell(string str) : value(str) {}
+
+	static ParseResult parse(string str)
+	{
+		bool behindBackquote = false;
+		char quote = '"';
+		if (str[0] != quote) return {};
+
+		int length = 1;
+		while ((behindBackquote || str[length] != quote) and
+		       length < str.size()) {
+			++length;
+		}
+
+		if (behindBackquote || str[length] != quote) return {};
+
+		return {std::pair(length,
+		                  std::make_unique<StringCell>(str.substr(0, length)))};
+	}
+
+	string str() const { return value; }
+};
+
 template <typename CellType> auto parse(string str)
 {
 	static_assert(std::is_base_of<Cell, CellType>::value,
