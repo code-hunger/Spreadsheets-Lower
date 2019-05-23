@@ -43,7 +43,7 @@ public:
 			++chars_read;
 		}
 
-		if (is_signed && chars_read == 1 or !is_signed && chars_read == 0)
+		if ((is_signed && chars_read == 1) or (!is_signed && chars_read == 0))
 			return {};
 
 		return {std::pair{chars_read, std::make_unique<IntCell>(num)}};
@@ -94,7 +94,7 @@ public:
 		char quote = '"';
 		if (str[0] != quote) return {};
 
-		int length = 1;
+		size_t length = 1;
 		string value;
 		while ((behindBackquote || str[length] != quote) and
 		       length < str.size()) {
@@ -130,7 +130,7 @@ ParseResult parse_unquoted(string str)
 {
 	size_t length = 0;
 
-	for (int i = 0; i < str.size() && str[i] == ','; ++i)
+	for (size_t i = 0; i < str.size() && str[i] != ','; ++i)
 		++length;
 
 	return {
@@ -193,7 +193,6 @@ public:
 	{
 		while (!input.eof()) {
 			RowT row;
-			// @TODO make it work for longer lines
 			string buffer;
 
 			std::getline(input, buffer);
@@ -223,14 +222,14 @@ public:
 	{
 		for (RowT const& row : data) {
 			for (auto& cell : row) {
-				std::cout << cell->str() << ", ";
+				std::cout << cell->str() << " | ";
 			}
 			std::cout << std::endl;
 		}
 	}
 };
 
-int main(int argc, char* argv[])
+int main(int, char* argv[])
 {
 	ParseResult result = parse(argv[1], ',');
 
