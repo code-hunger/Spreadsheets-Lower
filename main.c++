@@ -46,6 +46,8 @@ public:
 		if ((is_signed && chars_read == 1) or (!is_signed && chars_read == 0))
 			return {};
 
+		if(!positive) num *= -1;
+
 		return {std::pair{chars_read, std::make_unique<IntCell>(num)}};
 	};
 
@@ -119,13 +121,6 @@ public:
 	string str() const { return value; }
 };
 
-template <typename CellType> auto parse(string str)
-{
-	static_assert(std::is_base_of<Cell, CellType>::value,
-	              "Can parse only Cells");
-	return CellType::parse(str);
-}
-
 ParseResult parse_unquoted(string str)
 {
 	size_t length = 0;
@@ -135,14 +130,6 @@ ParseResult parse_unquoted(string str)
 
 	return {
 	    std::pair{length, std::make_unique<StringCell>(str.substr(0, length))}};
-}
-
-ParseResult parse_with_available_cells(string str)
-{
-	if (auto res = IntCell::parse(str)) return res;
-	if (auto res = StringCell::parse(str)) return res;
-	if (auto res = EmptyCell::parse(str)) return res;
-	return parse_unquoted(str);
 }
 
 bool is_prefix(string pref, string str)
@@ -158,9 +145,10 @@ bool is_prefix(char prefix, string str)
 	return str.size() >= 1 && str[0] == prefix;
 }
 
+template<typename CellT>
 ParseResult parse(string str, string cellSeparator)
 {
-	ParseResult result = parse_with_available_cells(str);
+	ParseResult result = CellT::parse(str);
 
 	if (!result) return result;
 	auto& value = result.value();
@@ -172,6 +160,14 @@ ParseResult parse(string str, string cellSeparator)
 		return result;
 
 	return {};
+}
+
+ParseResult parse(string str, string cellSeparator)
+{
+	if (auto res = parse<IntCell>(str, cellSeparator)) return res;
+	if (auto res = parse<StringCell>(str, cellSeparator)) return res;
+	if (auto res = parse<EmptyCell>(str, cellSeparator)) return res;
+	return parse_unquoted(str);
 }
 
 ParseResult parse(string str, char cellSeparator = ',')
