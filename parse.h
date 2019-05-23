@@ -7,32 +7,16 @@
 
 using std::string;
 
-ParseResult parse_unquoted(string str)
-{
-	size_t length = 0;
+ParseResult parse_unquoted(string str);
 
-	for (size_t i = 0; i < str.size() && str[i] != ','; ++i)
-		++length;
+bool is_prefix(string pref, string str);
 
-	return {
-	    std::pair{length, std::make_unique<StringCell>(str.substr(0, length))}};
-}
-
-bool is_prefix(string pref, string str)
-{
-	for (size_t i = 0; i < pref.size(); ++i) {
-		if (str[i] != pref[i] || i >= str.size()) return false;
-	}
-	return true;
-}
-
-bool is_prefix(char prefix, string str)
+inline bool is_prefix(char prefix, string str)
 {
 	return str.size() >= 1 && str[0] == prefix;
 }
 
-template<typename CellT>
-ParseResult parse(string str, string cellSeparator)
+template <typename CellT> ParseResult parse(string str, string cellSeparator)
 {
 	ParseResult result = CellT::parse(str);
 
@@ -48,15 +32,9 @@ ParseResult parse(string str, string cellSeparator)
 	return {};
 }
 
-ParseResult parse(string str, string cellSeparator)
-{
-	if (auto res = parse<IntCell>(str, cellSeparator)) return res;
-	if (auto res = parse<StringCell>(str, cellSeparator)) return res;
-	if (auto res = parse<EmptyCell>(str, cellSeparator)) return res;
-	return parse_unquoted(str);
-}
+ParseResult parse(string str, string cellSeparator);
 
-ParseResult parse(string str, char cellSeparator = ',')
+inline ParseResult parse(string str, char cellSeparator = ',')
 {
 	return parse(str, string{cellSeparator});
 }
