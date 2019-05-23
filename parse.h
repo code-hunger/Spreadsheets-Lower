@@ -1,5 +1,4 @@
-#ifndef PARSE_H
-#define PARSE_H
+#pragma once
 
 #include <boost/algorithm/string.hpp>
 #include <string>
@@ -61,5 +60,3 @@ ParseResult parse(string str, char cellSeparator = ',')
 {
 	return parse(str, string{cellSeparator});
 }
-
-#endif /* ifndef PARSE_H */

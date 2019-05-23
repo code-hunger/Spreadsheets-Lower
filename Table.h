@@ -1,8 +1,11 @@
+#pragma once
+
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "Cells.h"
 #include "parse.h"
 
 using std::string;
