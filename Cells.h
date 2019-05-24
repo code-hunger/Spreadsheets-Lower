@@ -46,5 +46,5 @@ public:
 
 	static ParseResult parse(string);
 
-	string str() const { return value; }
+	string str() const { return '"' + value + '"'; }
 };
