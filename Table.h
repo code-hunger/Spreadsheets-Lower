@@ -6,15 +6,19 @@
 #include "Cells.h"
 #include "parse.h"
 
-class Table
+struct Table
 {
 	using RowT = std::vector<std::unique_ptr<Cell>>;
-	std::vector<RowT> data;
+	using DataT = std::vector<RowT>;
 
-public:
 	Table() = default;
-
+	Table(DataT&& data) : data(std::move(data)) {}
 	Table(std::istream&);
 
 	void print();
+
+private:
+	DataT data;
+
+	std::vector<size_t> columnWidthCache;
 };
