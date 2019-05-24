@@ -1,5 +1,6 @@
 #include "Table.h"
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 
 using std::vector;
@@ -59,9 +60,12 @@ vector<size_t> computeWidths(Table::DataT const& data)
 void Table::print() const
 {
 	for (RowT const& row : data) {
-		for (auto& cell : row) {
-			std::cout << cell->str() << " | ";
+		using std::cout;
+		cout << "|";
+		for (size_t i = 0; i < row.size(); ++i) {
+			cout << " " << std::setw(columnWidthCache[i]) << row[i]->str()
+			     << " |";
 		}
-		std::cout << std::endl;
+		cout << std::endl;
 	}
 }
