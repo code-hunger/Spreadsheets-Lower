@@ -12,10 +12,10 @@ struct Table
 	using DataT = std::vector<RowT>;
 
 	Table() = default;
-	Table(DataT&& data) : data(std::move(data)) {}
+	Table(DataT&& data);
 	Table(std::istream&);
 
-	void print();
+	void print() const;
 
 private:
 	DataT data;
