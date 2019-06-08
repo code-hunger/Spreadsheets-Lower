@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <memory>
+#include "Formula.h"
 
 using std::string;
 using std::unique_ptr;
@@ -47,4 +48,17 @@ public:
 	static ParseResult parse(string);
 
 	string str() const { return '"' + value + '"'; }
+};
+
+class FormulaCell : public Cell
+{
+public:
+	FormulaCell (unique_ptr<Formula> value) : value(std::move(value)) {}
+
+	static ParseResult parse(string);
+
+	string str() const { throw "Computing a formula requires a context!"; }
+
+private:
+	unique_ptr<Formula> value;
 };

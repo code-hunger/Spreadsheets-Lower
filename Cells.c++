@@ -72,3 +72,12 @@ ParseResult StringCell::parse(string str)
 
 	return {std::pair(length, std::make_unique<StringCell>(value))};
 }
+
+ParseResult FormulaCell::parse(string str)
+{
+	if (auto formula = formulas::parse(str)) {
+		return {std::pair(formula->first, std::make_unique<FormulaCell>(
+		                                      std::move(formula->second)))};
+	}
+	return {};
+}

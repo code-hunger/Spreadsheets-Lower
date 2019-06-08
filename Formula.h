@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <optional>
+#include <string>
 
 namespace formulas {
 struct Context
@@ -41,6 +43,8 @@ struct Reference : Formula
 	virtual ~Reference(){};
 };
 
+std::optional<std::pair<size_t, std::unique_ptr<Formula>>>
+parse(std::string const& str);
 } // namespace formulas
 
 using Formula = formulas::Formula;
