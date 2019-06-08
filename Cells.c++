@@ -1,32 +1,12 @@
 #include "Cells.h"
+#include "parse.h"
 
 ParseResult IntCell::parse(string str)
 {
-	if (str.empty()) return {};
-
-	bool is_signed = str[0] == '-' || str[0] == '+', positive = str[0] != '-';
-	size_t chars_read = 0;
-
-	if (is_signed) {
-		str = str.substr(1);
-		++chars_read;
-	}
-
-	int num = 0;
-
-	for (char c : str) {
-		if (!isdigit(c)) break;
-
-		num = num * 10 + (c - '0');
-		++chars_read;
-	}
-
-	if ((is_signed && chars_read == 1) or (!is_signed && chars_read == 0))
-		return {};
-
-	if (!positive) num *= -1;
-
-	return {std::pair{chars_read, std::make_unique<IntCell>(num)}};
+	if (auto result = parseInt(str))
+		return {std::pair{result->first,
+		                  std::make_unique<IntCell>(result->second)}};
+	return {};
 }
 
 string IntCell::str() const

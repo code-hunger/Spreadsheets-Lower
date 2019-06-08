@@ -38,3 +38,5 @@ inline ParseResult parse(string str, char cellSeparator = ',')
 {
 	return parse(str, string{cellSeparator});
 }
+
+std::optional<std::pair<size_t, int>> parseInt(string);
