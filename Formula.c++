@@ -2,15 +2,20 @@
 
 using namespace formulas;
 
-float Binary::compute() const {
+float compute(float left, Binary::OP op, float right)
+{
 	switch (op) {
 	case Binary::plus:
-		return left->compute() + right->compute();
+		return left + right;
 
 	case Binary::minus:
-		return left->compute() - right->compute();
+		return left - right;
 
 	default:
 		throw "Formula operation unsupported.";
 	}
+}
+
+float Binary::compute() const {
+	return ::compute(left->compute(), op, right->compute());
 }
