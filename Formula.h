@@ -20,6 +20,7 @@ struct Formula
 struct Atomic : Formula
 {
 	const float value;
+	Atomic(float value) : value(value) {}
 	float compute(Context const&) const override { return value; }
 	virtual ~Atomic(){};
 };
@@ -30,6 +31,11 @@ struct Binary : Formula
 	const OP op;
 
 	const std::unique_ptr<Formula> left, right;
+
+	Binary(std::unique_ptr<Formula> left, OP op, std::unique_ptr<Formula> right)
+	    : op(op), left(std::move(left)), right(std::move(right))
+	{
+	}
 
 	float compute(Context const&) const override;
 
