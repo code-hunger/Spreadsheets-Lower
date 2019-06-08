@@ -16,6 +16,7 @@ float compute(float left, Binary::OP op, float right)
 	}
 }
 
-float Binary::compute() const {
-	return ::compute(left->compute(), op, right->compute());
+float Binary::compute(Context const& c) const
+{
+	return ::compute(left->compute(c), op, right->compute(c));
 }
