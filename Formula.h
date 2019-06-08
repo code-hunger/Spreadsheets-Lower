@@ -16,7 +16,7 @@ struct Atomic : Formula
 	virtual ~Atomic(){};
 };
 
-struct BinaryFormula : Formula
+struct Binary : Formula
 {
 	enum OP { plus, minus, multiply, divide, exp };
 	const OP op;
@@ -25,7 +25,7 @@ struct BinaryFormula : Formula
 
 	float compute() const override;
 
-	virtual ~BinaryFormula(){};
+	virtual ~Binary(){};
 };
 
 } // namespace formulas
