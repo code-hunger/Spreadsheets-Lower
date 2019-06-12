@@ -27,7 +27,7 @@ struct Atomic : Formula
 	virtual ~Atomic(){};
 };
 
-constexpr char operators[] = {'+', '-', '\\', '*', '^'};
+constexpr char operators[] = {'+', '-', '/', '*', '^'};
 
 struct Binary : Formula
 {
