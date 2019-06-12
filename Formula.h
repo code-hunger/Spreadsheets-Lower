@@ -61,8 +61,7 @@ struct Reference : Formula
 	virtual ~Reference(){};
 };
 
-std::optional<std::pair<size_t, FormulaPtr>>
-parse(std::string const& str);
+std::optional<FormulaPtr> parse(std::string str);
 } // namespace formulas
 
 using Formula = formulas::Formula;

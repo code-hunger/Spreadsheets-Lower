@@ -69,6 +69,56 @@ optional<pair<size_t, CellReference>> parseReference(string str)
 	return {};
 }
 
+size_t readTerm(string const& str)
+{
+	size_t depth = 0;
+	bool hasBraces = !str.empty() && str.front() == '(';
+
+	size_t i = 0;
+	for (; i < str.size(); ++i) {
+		const char c = str[i];
+		if (c == '(') {
+			++depth;
+			if (!hasBraces) return i;
+		}
+		if (c == ')') {
+			if (depth == 0 || !hasBraces) return i;
+			if (depth == 1) return i + 1;
+			--depth;
+		}
+		if (depth == 0 && isOperator(c)) return i;
+	}
+
+	if (depth != 0) std::cerr << "Unballanced braces in " << str << std::endl;
+
+	return i;
+}
+
+FormulaPtr fromString(string);
+
+FormulaPtr fromTermAndRest(string left, string rest)
+{
+	if (rest.empty()) {
+		boost::trim(left);
+		return fromString(left);
+	}
+	if (left.empty()) {
+		std::cerr << "Left term empty at " << rest << std::endl;
+		throw "Left term empty error.";
+	}
+
+	boost::trim(rest);
+	char op = rest[0];
+
+	if (!isOperator(op)) {
+		std::cerr << "Expected operator, found " << op << " after " << left
+		          << std::endl;
+	}
+
+	return std::make_unique<formulas::Binary>(fromString(left), op,
+	                                          fromString(rest.substr(1)));
+}
+
 FormulaPtr fromString(string str)
 {
 	if (auto result = parseInt(str); result && result->first == str.size()) {
@@ -81,9 +131,28 @@ FormulaPtr fromString(string str)
 		CellReference const& ref = result->second;
 		return std::make_unique<formulas::Reference>(ref);
 	}
+
+	size_t termLength = readTerm(str);
+	string term = str.substr(0, termLength - 1), rest = str.substr(termLength);
+
+	boost::trim(term);
+	boost::trim(rest);
+
+	if (!term.empty() && term[0] == '(' && term.back() == ')')
+		term = term.substr(1, term.size() - 1);
+
+	return fromTermAndRest(term, rest);
 }
 
-std::optional<std::pair<size_t, FormulaPtr>>
-formulas::parse(std::string const& str)
+std::optional<FormulaPtr> formulas::parse(std::string str)
 {
+	boost::trim(str);
+	try
+	{
+		return fromString(str);
+	}
+	catch(...) {
+		std::cerr << "Error building formula." << std::endl;
+		return {};
+	}
 }

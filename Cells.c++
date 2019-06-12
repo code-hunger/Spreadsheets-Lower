@@ -55,9 +55,19 @@ ParseResult StringCell::parse(string str)
 
 ParseResult FormulaCell::parse(string str)
 {
-	if (auto formula = formulas::parse(str)) {
-		return {std::pair(formula->first, std::make_unique<FormulaCell>(
-		                                      std::move(formula->second)))};
+	if (!is_prefix("=[", str)) return {};
+
+	for (size_t i = 2; i < str.size(); ++i) {
+		if (str[i] == '[') return {};
+
+		if (str[i] == ']') {
+			if (auto formula = formulas::parse(str.substr(2, i))) {
+				return {std::pair(i - 2, std::make_unique<FormulaCell>(
+				                             std::move(formula.value())))};
+			}
+			return {};
+		}
 	}
+
 	return {};
 }
