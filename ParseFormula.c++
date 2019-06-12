@@ -1,12 +1,41 @@
 #include "Formula.h"
 #include "parse.h"
 
+#include <iostream>
+
 using FormulaPtr = std::unique_ptr<Formula>;
 using std::optional;
 using std::pair;
 using std::string;
 
 using CellReference = pair<size_t, size_t>;
+
+bool isOperator(char c)
+{
+	for (char op : formulas::operators) {
+		if (c == op) return true;
+	}
+	return false;
+}
+
+formulas::Binary::OP formulas::Binary::toOp(char op)
+{
+	switch (op) {
+	case '+':
+		return plus;
+	case '-':
+		return minus;
+	case '*':
+		return multiply;
+	case '/':
+		return divide;
+	case '^':
+		return exp;
+	}
+
+	std::cerr << "Unknown operator " << op << std::endl;
+	throw "Unknown operator";
+}
 
 // Please loook at how the Reference and the Number parser are implemented in
 // Perl6:

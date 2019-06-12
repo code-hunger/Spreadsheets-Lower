@@ -27,6 +27,8 @@ struct Atomic : Formula
 	virtual ~Atomic(){};
 };
 
+constexpr char operators[] = {'+', '-', '\\', '*', '^'};
+
 struct Binary : Formula
 {
 	enum OP { plus, minus, multiply, divide, exp };
@@ -34,8 +36,15 @@ struct Binary : Formula
 
 	const FormulaPtr left, right;
 
+	static OP toOp(char op);
+
 	Binary(FormulaPtr left, OP op, FormulaPtr right)
 	    : op(op), left(std::move(left)), right(std::move(right))
+	{
+	}
+
+	Binary(FormulaPtr left, char op, FormulaPtr right)
+	    : op(toOp(op)), left(std::move(left)), right(std::move(right))
 	{
 	}
 
