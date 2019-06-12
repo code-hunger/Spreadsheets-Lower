@@ -17,6 +17,8 @@ struct Formula
 	virtual ~Formula(){};
 };
 
+using FormulaPtr = std::unique_ptr<Formula>;
+
 struct Atomic : Formula
 {
 	const float value;
@@ -30,9 +32,9 @@ struct Binary : Formula
 	enum OP { plus, minus, multiply, divide, exp };
 	const OP op;
 
-	const std::unique_ptr<Formula> left, right;
+	const FormulaPtr left, right;
 
-	Binary(std::unique_ptr<Formula> left, OP op, std::unique_ptr<Formula> right)
+	Binary(FormulaPtr left, OP op, FormulaPtr right)
 	    : op(op), left(std::move(left)), right(std::move(right))
 	{
 	}
@@ -50,7 +52,7 @@ struct Reference : Formula
 	virtual ~Reference(){};
 };
 
-std::optional<std::pair<size_t, std::unique_ptr<Formula>>>
+std::optional<std::pair<size_t, FormulaPtr>>
 parse(std::string const& str);
 } // namespace formulas
 
