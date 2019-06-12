@@ -61,8 +61,8 @@ ParseResult FormulaCell::parse(string str)
 		if (str[i] == '[') return {};
 
 		if (str[i] == ']') {
-			if (auto formula = formulas::parse(str.substr(2, i))) {
-				return {std::pair(i - 2, std::make_unique<FormulaCell>(
+			if (auto formula = formulas::parse(str.substr(2, i - 2))) {
+				return {std::pair(i, std::make_unique<FormulaCell>(
 				                             std::move(formula.value())))};
 			}
 			return {};

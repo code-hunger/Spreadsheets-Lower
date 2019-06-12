@@ -24,6 +24,7 @@ ParseResult parse(string str, string cellSeparator)
 	if (auto res = parse<IntCell>(str, cellSeparator)) return res;
 	if (auto res = parse<StringCell>(str, cellSeparator)) return res;
 	if (auto res = parse<EmptyCell>(str, cellSeparator)) return res;
+	if (auto res = parse<FormulaCell>(str, cellSeparator)) return res;
 	return parse_unquoted(str);
 }
 
