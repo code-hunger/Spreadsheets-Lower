@@ -8,6 +8,14 @@ using std::string;
 
 using CellReference = pair<size_t, size_t>;
 
+// Please loook at how the Reference and the Number parser are implemented in
+// Perl6:
+/*
+ * my regex float { \-? \d* \.? \d+ }
+ * multi fromString (Str $str where /^ <float> $/) { return $str.Rat }
+ * multi fromString (Str $str where /^R(\N)C(\N)$/) { return ($0 - 1, $1 - 1) }
+ * */
+
 optional<pair<size_t, CellReference>> parseReference(string str)
 {
 	if (str.empty() || str[0] != 'R') return {};
@@ -39,7 +47,8 @@ FormulaPtr fromString(string str)
 		    formulas::Atomic{static_cast<float>(result->second)});
 	}
 
-	if(auto result = parseReference(str); result && result->first == str.size()) {
+	if (auto result = parseReference(str);
+	    result && result->first == str.size()) {
 		CellReference const& ref = result->second;
 		return std::make_unique<formulas::Reference>(ref);
 	}

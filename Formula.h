@@ -46,6 +46,7 @@ struct Reference : Formula
 {
 	size_t x, y;
 	float compute(Context const& c) const override { return c.at(x, y); }
+	Reference(std::pair<size_t, size_t> cell) : x(cell.first), y(cell.second) {}
 	virtual ~Reference(){};
 };
 
