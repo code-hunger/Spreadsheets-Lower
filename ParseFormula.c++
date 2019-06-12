@@ -127,7 +127,6 @@ FormulaPtr fromTermAndRest(string left, string rest)
 
 FormulaPtr fromString(string str)
 {
-	std::cout << "From string: '" << str << "'" << std::endl;
 	if (auto result = parseInt(str); result && result->first == str.size()) {
 		return std::make_unique<formulas::Atomic>(
 		    formulas::Atomic{static_cast<float>(result->second)});
@@ -140,20 +139,20 @@ FormulaPtr fromString(string str)
 	}
 
 	size_t termLength = readTerm(str);
-	string term = str.substr(0, termLength - 1), rest = str.substr(termLength);
+	string term = str.substr(0, termLength), rest = str.substr(termLength);
 
 	boost::trim(term);
 	boost::trim(rest);
 
-	if (!term.empty() && term[0] == '(' && term.back() == ')')
-		term = term.substr(1, term.size() - 1);
+	if (!term.empty() && term[0] == '(' && term.back() == ')') {
+		term = term.substr(1, term.size() - 2);
+	}
 
 	return fromTermAndRest(term, rest);
 }
 
 std::optional<FormulaPtr> formulas::parse(std::string str)
 {
-	std::cout << "WILL parse formula '" << str << "'" << std::endl;
 	boost::trim(str);
 	try {
 		return fromString(str);
