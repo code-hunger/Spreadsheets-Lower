@@ -50,12 +50,12 @@ optional<pair<size_t, CellReference>> parseReference(string str)
 	if (str.empty() || str[0] != 'R') return {};
 
 	if (auto result = parseInt(str.substr(1))) {
-		size_t length = result->first + 1;
+		size_t length = result->first + 1; // including the 'R'
 		const int x = result->second;
 		if (x < 0) return {};
 
-		str = str.substr(1 + length);
-		if (str.empty() || str[0] != 'N') return {};
+		str = str.substr(length);
+		if (str.empty() || str[0] != 'C') return {};
 
 		if (auto result = parseInt(str.substr(1))) {
 			const int y = result->second;
@@ -89,7 +89,10 @@ size_t readTerm(string const& str)
 		if (depth == 0 && isOperator(c)) return i;
 	}
 
-	if (depth != 0) std::cerr << "Unballanced braces in " << str << std::endl;
+	if (depth != 0) {
+		std::cerr << "Unballanced braces in '" << str << "'" << std::endl;
+		throw "X";
+	}
 
 	return i;
 }
@@ -107,7 +110,7 @@ FormulaPtr fromTermAndRest(string left, string rest)
 		throw "Left term empty error.";
 	}
 
-	boost::trim(rest);
+	boost::trim_left(rest);
 	char op = rest[0];
 
 	if (!isOperator(op)) {
@@ -115,12 +118,16 @@ FormulaPtr fromTermAndRest(string left, string rest)
 		          << std::endl;
 	}
 
+	boost::trim(left);
+	rest = rest.substr(1);
+	boost::trim(rest);
 	return std::make_unique<formulas::Binary>(fromString(left), op,
-	                                          fromString(rest.substr(1)));
+	                                          fromString(rest));
 }
 
 FormulaPtr fromString(string str)
 {
+	std::cout << "From string: '" << str << "'" << std::endl;
 	if (auto result = parseInt(str); result && result->first == str.size()) {
 		return std::make_unique<formulas::Atomic>(
 		    formulas::Atomic{static_cast<float>(result->second)});
@@ -146,12 +153,11 @@ FormulaPtr fromString(string str)
 
 std::optional<FormulaPtr> formulas::parse(std::string str)
 {
+	std::cout << "WILL parse formula '" << str << "'" << std::endl;
 	boost::trim(str);
-	try
-	{
+	try {
 		return fromString(str);
-	}
-	catch(...) {
+	} catch (...) {
 		std::cerr << "Error building formula." << std::endl;
 		return {};
 	}
