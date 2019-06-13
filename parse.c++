@@ -1,4 +1,5 @@
 #include "parse.h"
+#include <cmath>
 
 ParseResult parse_unquoted(string str)
 {
@@ -21,8 +22,8 @@ bool is_prefix(string pref, string str)
 
 ParseResult parse(string str, string cellSeparator)
 {
-	if (auto res = parse<IntCell>(str, cellSeparator)) return res;
 	if (auto res = parse<FloatCell>(str, cellSeparator)) return res;
+	if (auto res = parse<IntCell>(str, cellSeparator)) return res;
 	if (auto res = parse<StringCell>(str, cellSeparator)) return res;
 	if (auto res = parse<EmptyCell>(str, cellSeparator)) return res;
 	if (auto res = parse<FormulaCell>(str, cellSeparator)) return res;
@@ -77,6 +78,6 @@ std::optional<std::pair<size_t, float>> parseFloat(string str)
 	const int afterPoint = b->second;
 	chars_read += b->first;
 
-	const float num = whole + afterPoint * pow(10, -b->first);
+	const float num = whole + afterPoint / std::pow(10, (b->first));
 	return {std::pair(chars_read, num)};
 }
