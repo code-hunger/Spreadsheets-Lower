@@ -1,11 +1,26 @@
+#include "Cells.h"
+#include "Formula.h"
 #include "Table.h"
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include <iomanip>
 #include <iostream>
 
 using std::vector;
 
 vector<size_t> computeWidths(Table::DataT const&);
+
+struct Table::ContextAccessor : formulas::Context
+{
+	const Table::DataT* data;
+
+	float at(size_t x, size_t y) const override
+	{
+		if (auto val = parseFloat((*data)[x - 1][y - 1]->str(*this)))
+			return val->second;
+		return 0;
+	}
+};
 
 Table::Table(std::istream& input)
 {
@@ -72,12 +87,19 @@ vector<size_t> computeWidths(Table::DataT const& data)
 {
 	vector<size_t> widths;
 
+	Table::ContextAccessor context;
+	context.data = &data;
+
 	for (auto const& row : data) {
 		widths.resize(std::max(widths.size(), row.size()));
 		for (size_t i = 0; i < row.size(); ++i) {
-			widths[i] = std::max(widths[i], utf8_strlen(row[i]->str()));
+			widths[i] = std::max(widths[i], utf8_strlen(row[i]->str(context)));
 		}
 	}
+
+	std::cout << "STILL HEREJk- " << std::endl;
+
+	context.data = nullptr;
 
 	return widths;
 }
@@ -90,12 +112,16 @@ string pad(string str, size_t length)
 
 void Table::print() const
 {
+	ContextAccessor context;
+	context.data = &data;
 	for (RowT const& row : data) {
 		using std::cout;
 		cout << "|";
 		for (size_t i = 0; i < row.size(); ++i) {
-			cout << " " << pad(row[i]->str(), columnWidthCache[i]) << " |";
+			cout << " " << pad(row[i]->str(context), columnWidthCache[i])
+			     << " |";
 		}
 		cout << std::endl;
 	}
+	context.data = nullptr;
 }

@@ -40,3 +40,4 @@ inline ParseResult parse(string str, char cellSeparator = ',')
 }
 
 std::optional<std::pair<size_t, int>> parseInt(string);
+std::optional<std::pair<size_t, float>> parseFloat(string);

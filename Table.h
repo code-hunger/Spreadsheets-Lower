@@ -8,7 +8,7 @@
 
 struct Table
 {
-	using RowT = std::vector<std::unique_ptr<Cell>>;
+	using RowT = std::vector<std::unique_ptr<ContextCell>>;
 	using DataT = std::vector<RowT>;
 
 	Table() = default;
@@ -16,6 +16,8 @@ struct Table
 	Table(std::istream&);
 
 	void print() const;
+
+	struct ContextAccessor;
 
 private:
 	DataT data;

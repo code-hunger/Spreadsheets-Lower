@@ -12,16 +12,18 @@ using std::unique_ptr;
 struct Cell
 {
 	virtual string str() const = 0;
+	virtual ~Cell () {};
 };
 
 struct ContextCell
 {
 	virtual string str(formulas::Context const&) const = 0;
+	virtual ~ContextCell () {};
 };
 
-using ParseResult = std::optional<std::pair<size_t, unique_ptr<Cell>>>;
+using ParseResult = std::optional<std::pair<size_t, unique_ptr<ContextCell>>>;
 
-class IntCell : public Cell, ContextCell
+class IntCell : public Cell, public ContextCell
 {
 	int value;
 
@@ -34,6 +36,8 @@ public:
 
 	string str() const override;
 	string str(formulas::Context const&) const override { return str(); };
+
+	virtual ~IntCell() {};
 };
 
 struct EmptyCell : Cell, ContextCell
@@ -45,9 +49,11 @@ struct EmptyCell : Cell, ContextCell
 
 	string str() const override { return ""; }
 	string str(formulas::Context const&) const override { return str(); };
+
+	virtual ~EmptyCell() {};
 };
 
-class StringCell : public Cell, ContextCell
+class StringCell : public Cell, public ContextCell
 {
 	string value;
 
@@ -58,9 +64,11 @@ public:
 
 	string str() const override { return '"' + value + '"'; }
 	string str(formulas::Context const&) const override { return str(); };
+
+	virtual ~StringCell() {};
 };
 
-class FormulaCell : public Cell, ContextCell
+class FormulaCell : public Cell, public ContextCell
 {
 public:
 	FormulaCell (unique_ptr<Formula> value) : value(std::move(value)) {}
@@ -70,12 +78,14 @@ public:
 	string str() const override
 	{
 		std::cerr << "Computing a formula requires a context!" << std::endl;
+		return "[ ?? ]";
 	}
 	string str(formulas::Context const& context) const override
 	{
 		return boost::lexical_cast<std::string>(value->compute(context));
 	};
 
+	~FormulaCell() {}
 private:
 	unique_ptr<Formula> value;
 };
