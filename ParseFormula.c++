@@ -18,6 +18,25 @@ bool isOperator(char c)
 	return false;
 }
 
+char formulas::Binary::fromOp(formulas::Binary::OP op)
+{
+	switch (op) {
+	case plus:
+		return '+';
+	case minus:
+		return '-';
+	case multiply:
+		return '*';
+	case divide:
+		return '/';
+	case exp:
+		return '^';
+	}
+
+	std::cerr << "Unknown operator " << op << std::endl;
+	throw "Unknown operator";
+}
+
 formulas::Binary::OP formulas::Binary::toOp(char op)
 {
 	switch (op) {
