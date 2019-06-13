@@ -12,13 +12,16 @@ using std::unique_ptr;
 struct Cell
 {
 	virtual string str() const = 0;
-	virtual ~Cell () {};
+
+	virtual ~Cell(){};
 };
 
 struct ContextCell
 {
 	virtual string str(formulas::Context const&) const = 0;
-	virtual ~ContextCell () {};
+	virtual float asFloat(formulas::Context const&) const = 0;
+
+	virtual ~ContextCell(){};
 };
 
 using ParseResult = std::optional<std::pair<size_t, unique_ptr<ContextCell>>>;
@@ -36,8 +39,9 @@ public:
 
 	string str() const override;
 	string str(formulas::Context const&) const override { return str(); };
+	float asFloat(formulas::Context const&) const override { return value; }
 
-	virtual ~IntCell() {};
+	virtual ~IntCell(){};
 };
 
 class FloatCell : public Cell, public ContextCell
@@ -53,8 +57,9 @@ public:
 
 	string str() const override;
 	string str(formulas::Context const&) const override { return str(); };
+	float asFloat(formulas::Context const&) const override { return value; }
 
-	virtual ~FloatCell() {};
+	virtual ~FloatCell(){};
 };
 
 struct EmptyCell : Cell, public ContextCell
@@ -66,8 +71,9 @@ struct EmptyCell : Cell, public ContextCell
 
 	string str() const override { return ""; }
 	string str(formulas::Context const&) const override { return str(); };
+	float asFloat(formulas::Context const&) const override { return 0; }
 
-	virtual ~EmptyCell() {};
+	virtual ~EmptyCell(){};
 };
 
 class StringCell : public Cell, public ContextCell
@@ -82,13 +88,15 @@ public:
 	string str() const override { return '"' + value + '"'; }
 	string str(formulas::Context const&) const override { return str(); };
 
-	virtual ~StringCell() {};
+	float asFloat(formulas::Context const&) const override;
+
+	virtual ~StringCell(){};
 };
 
 class FormulaCell : public Cell, public ContextCell
 {
 public:
-	FormulaCell (unique_ptr<Formula> value) : value(std::move(value)) {}
+	FormulaCell(unique_ptr<Formula> value) : value(std::move(value)) {}
 
 	static ParseResult parse(string);
 
@@ -102,7 +110,10 @@ public:
 		return boost::lexical_cast<std::string>(value->compute(context));
 	};
 
+	float asFloat(formulas::Context const&) const override;
+
 	~FormulaCell() {}
+
 private:
 	unique_ptr<Formula> value;
 };

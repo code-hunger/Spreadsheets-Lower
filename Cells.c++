@@ -12,12 +12,12 @@ ParseResult IntCell::parse(string str)
 string IntCell::str() const
 {
 	string x;
-	int value = this->value >= 0 ? this->value : - this->value;
+	int value = this->value >= 0 ? this->value : -this->value;
 	while (value) {
 		x += value % 10 + '0';
 		value /= 10;
 	}
-	if(this->value < 0) x += '-';
+	if (this->value < 0) x += '-';
 
 	const size_t size = x.size();
 	for (size_t i = 0; i < size / 2; ++i) {
@@ -27,18 +27,15 @@ string IntCell::str() const
 	return x;
 }
 
-ParseResult FloatCell::parse(string str) {
+ParseResult FloatCell::parse(string str)
+{
 	if (auto result = parseFloat(str))
 		return {std::pair{result->first,
 		                  std::make_unique<FloatCell>(result->second)}};
 	return {};
 }
 
-string FloatCell::str() const
-{
-	return boost::lexical_cast<string>(value);
-}
-
+string FloatCell::str() const { return boost::lexical_cast<string>(value); }
 
 ParseResult StringCell::parse(string str)
 {
@@ -67,6 +64,8 @@ ParseResult StringCell::parse(string str)
 	return {std::pair(length, std::make_unique<StringCell>(value))};
 }
 
+float StringCell::asFloat(formulas::Context const&) const { if(auto val =  parseFloat(value)) return val->second; return 0; }
+
 ParseResult FormulaCell::parse(string str)
 {
 	if (!is_prefix("=[", str)) return {};
@@ -84,4 +83,9 @@ ParseResult FormulaCell::parse(string str)
 	}
 
 	return {};
+}
+
+float FormulaCell::asFloat(formulas::Context const& context) const
+{
+	return value->compute(context);
 }

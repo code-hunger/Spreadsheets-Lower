@@ -16,8 +16,8 @@ struct Table::ContextAccessor : formulas::Context
 
 	float at(size_t x, size_t y) const override
 	{
-		if (auto val = parseFloat((*data)[x - 1][y - 1]->str(*this)))
-			return val->second;
+		if (float val = ((*data)[x - 1][y - 1]->asFloat(*this)))
+			return val;
 		return 0;
 	}
 };
