@@ -40,7 +40,24 @@ public:
 	virtual ~IntCell() {};
 };
 
-struct EmptyCell : Cell, ContextCell
+class FloatCell : public Cell, public ContextCell
+{
+	float value;
+
+public:
+	static ParseResult parse(string str);
+
+	FloatCell(float value) : value(value) {}
+
+	FloatCell(FloatCell const& other) : value(other.value) {}
+
+	string str() const override;
+	string str(formulas::Context const&) const override { return str(); };
+
+	virtual ~FloatCell() {};
+};
+
+struct EmptyCell : Cell, public ContextCell
 {
 	static ParseResult parse(string)
 	{

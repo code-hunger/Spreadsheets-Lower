@@ -27,6 +27,19 @@ string IntCell::str() const
 	return x;
 }
 
+ParseResult FloatCell::parse(string str) {
+	if (auto result = parseFloat(str))
+		return {std::pair{result->first,
+		                  std::make_unique<FloatCell>(result->second)}};
+	return {};
+}
+
+string FloatCell::str() const
+{
+	return boost::lexical_cast<string>(value);
+}
+
+
 ParseResult StringCell::parse(string str)
 {
 	bool behindBackquote = false;

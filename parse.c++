@@ -22,6 +22,7 @@ bool is_prefix(string pref, string str)
 ParseResult parse(string str, string cellSeparator)
 {
 	if (auto res = parse<IntCell>(str, cellSeparator)) return res;
+	if (auto res = parse<FloatCell>(str, cellSeparator)) return res;
 	if (auto res = parse<StringCell>(str, cellSeparator)) return res;
 	if (auto res = parse<EmptyCell>(str, cellSeparator)) return res;
 	if (auto res = parse<FormulaCell>(str, cellSeparator)) return res;
@@ -54,5 +55,28 @@ std::optional<std::pair<size_t, int>> parseInt(string str)
 
 	if (!positive) num *= -1;
 
+	return {std::pair(chars_read, num)};
+}
+
+std::optional<std::pair<size_t, float>> parseFloat(string str)
+{
+	const auto a = parseInt(str);
+	if (!a) return {};
+
+	const int whole = a->second;
+
+	str = str.substr(a->first);
+
+	if (str[0] != '.') return {};
+
+	size_t chars_read = a->first + 1;
+
+	const auto b = parseInt(str.substr(1));
+	if (!b) return {};
+
+	const int afterPoint = b->second;
+	chars_read += b->first;
+
+	const float num = whole + afterPoint * pow(10, -b->first);
 	return {std::pair(chars_read, num)};
 }
