@@ -12,11 +12,12 @@ ParseResult IntCell::parse(string str)
 string IntCell::str() const
 {
 	string x;
-	int value = this->value;
+	int value = this->value >= 0 ? this->value : - this->value;
 	while (value) {
 		x += value % 10 + '0';
 		value /= 10;
 	}
+	if(this->value < 0) x += '-';
 
 	const size_t size = x.size();
 	for (size_t i = 0; i < size / 2; ++i) {
